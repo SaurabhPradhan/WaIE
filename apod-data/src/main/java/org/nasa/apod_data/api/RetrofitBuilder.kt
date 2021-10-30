@@ -1,6 +1,7 @@
 package org.nasa.apod_data.api
 
 import okhttp3.OkHttpClient
+import org.nasa.apod_data.BuildConfig
 import org.nasa.apod_data.api.operation.DailyAPODOperation
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -16,7 +17,7 @@ class RetrofitBuilder {
     private val retrofit: Retrofit by lazy {
         Retrofit.Builder()
             .client(okHttpClient)
-            .baseUrl("")
+            .baseUrl(BuildConfig.APOD_BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }

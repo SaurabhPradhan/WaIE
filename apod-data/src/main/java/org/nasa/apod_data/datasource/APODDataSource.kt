@@ -1,7 +1,6 @@
 package org.nasa.apod_data.datasource
 
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
 import org.nasa.apod_data.DI
 import org.nasa.apod_domain.Result

@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">APOD</string>
+    <string name="error_msg">We are not connected to the internet, showing you the last image we have.</string>
+    <string name="error_msg_with_no_data">We are not connected to the internet.</string>
 </resources>

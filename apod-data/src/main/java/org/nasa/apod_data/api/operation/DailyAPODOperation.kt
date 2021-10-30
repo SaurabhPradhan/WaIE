@@ -6,6 +6,6 @@ import retrofit2.http.Query
 
 interface DailyAPODOperation {
     // returns apod data
-    @GET("/apod")
+    @GET("/planetary/apod")
     suspend fun getDailyAPOD(@Query("api_key") key: String): DailyAPOD
 }
