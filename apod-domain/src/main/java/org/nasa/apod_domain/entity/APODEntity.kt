@@ -4,9 +4,9 @@ data class APODEntity(
     val copyright: String,
     val date: String,
     val explanation: String,
-    val hdurl: String,
-    val media_type: String,
-    val service_version: String,
+    val hdImgUrl: String,
+    val mediaType: String,
+    val apiVersion: String,
     val title: String,
-    val url: String
+    val imgUrl: String
 )

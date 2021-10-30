@@ -1,6 +1,7 @@
 package org.nasa.apod_domain.repository
 
 import java.lang.UnsupportedOperationException
+import org.nasa.apod_domain.Result
 
 interface Repository<I, O> {
     suspend fun get(params: I): Result<O> = throw UnsupportedOperationException(NOT_IMPLEMENTED)

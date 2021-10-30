@@ -9,3 +9,4 @@ dependencyResolutionManagement {
 rootProject.name = "APOD"
 include ':app'
 include ':apod-domain'
+include ':apod-data'

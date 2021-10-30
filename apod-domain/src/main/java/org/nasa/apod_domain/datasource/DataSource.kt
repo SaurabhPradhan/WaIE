@@ -2,6 +2,8 @@ package org.nasa.apod_domain.datasource
 
 import java.lang.UnsupportedOperationException
 
+import org.nasa.apod_domain.Result
+
 interface Datasource<I, O> {
     /**
      * Gets a single element of type [O]
