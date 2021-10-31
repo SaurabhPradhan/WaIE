@@ -1,5 +1,6 @@
 package org.nasa.apod.viewmodel
 
+import android.net.Network
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -17,28 +18,36 @@ class APODViewModel(private val db: APODDataBase) : ViewModel() {
     val dailyData = MutableLiveData<DailyAPOD>()
     val lastSeenData = MutableLiveData<DailyAPOD>()
 
-    fun getDailyAPOD() {
+    fun getDailyAPOD(isNetwork: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
-            when (val result = ServiceInstance.dailyAPODService.getDailyAPOD()) {
-                is Result.Success -> {
-                    db.podDao()?.insertDailyAPOD(result.data)
-                    dailyData.value = db.podDao()?.getDailAPOD()
-                        ?.find { it1 -> it1.date.toDate() == System.currentTimeMillis().toDate() }
-                }
-                is Result.Error -> {
-                    val dailyList = db.podDao()?.getDailAPOD()
-                    val data = dailyList?.find { it1 ->
-                        it1.date.toDate() == System.currentTimeMillis().toDate()
+            if (isNetwork) {
+                when (val result = ServiceInstance.dailyAPODService.getDailyAPOD()) {
+                    is Result.Success -> {
+                        db.podDao()?.insertDailyAPOD(result.data)
+                        val dailyList = db.podDao()?.getDailAPOD()
+                        checkData(dailyList)
                     }
-                    if (data == null) {
-                        lastSeenData.value = dailyList?.find { it1 ->
-                            it1.date.toDate() == System.currentTimeMillis().toPrevDate()
-                        }
-                    } else {
-                        dailyData.value = data
+                    is Result.Error -> {
+                        val dailyList = db.podDao()?.getDailAPOD()
+                        checkData(dailyList)
                     }
                 }
+            } else {
+                checkData(db.podDao()?.getDailAPOD())
             }
+        }
+    }
+
+    private fun checkData(dailyList: List<DailyAPOD>?) {
+        val dailyAPODData = dailyList?.find { it1 ->
+            it1.date.toDate() == System.currentTimeMillis().toDate()
+        }
+        if (dailyAPODData == null) {
+            lastSeenData.postValue(dailyList?.find { it1 ->
+                it1.date.toDate() == System.currentTimeMillis().toPrevDate()
+            })
+        } else {
+            dailyData.postValue(dailyAPODData)
         }
     }
 }

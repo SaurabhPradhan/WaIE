@@ -11,34 +11,31 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 
-class Network(private val context: Context, val mListener: NetworkInterface) :
-    LifecycleObserver {
-    private val mLogTag: String = Network::class.java.simpleName
+class Network(private val context: Context, val networkInterface: NetworkInterface) {
+
     private val mNetworkCallback: ConnectivityManager.NetworkCallback by lazy {
         object : ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network) {
                 super.onAvailable(network)
-                mListener.isNetworkAvailable(true)
+                networkInterface.isNetworkAvailable(true)
             }
 
             override fun onLost(network: Network) {
                 super.onLost(network)
-                mListener.isNetworkAvailable(false)
+                networkInterface.isNetworkAvailable(false)
             }
 
             override fun onUnavailable() {
                 super.onUnavailable()
-                mListener.isNetworkAvailable(false)
+                networkInterface.isNetworkAvailable(false)
             }
         }
     }
 
-    @SuppressLint("MissingPermission")
-    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun registerNetworkCallback() {
         try {
             val connectivityManager =
-                context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+                (context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager)
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                 connectivityManager.registerDefaultNetworkCallback(mNetworkCallback)
             } else {
@@ -50,28 +47,20 @@ class Network(private val context: Context, val mListener: NetworkInterface) :
         } catch (e: Exception) {
             Log.e("Network error", e.toString())
         }
-        mListener.isNetworkAvailable(initializeFirstTimeValue())
-    }
-
-    @SuppressLint("MissingPermission")
-    @Suppress("DEPRECATION")
-    private fun initializeFirstTimeValue(): Boolean {
-        val connectivityManager =
-            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            val capabilities =
-                connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
-            capabilities != null && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-                    && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
-        } else {
-            connectivityManager.activeNetworkInfo?.isConnected == true
+        if (!isNetworkAvailable(context)) {
+            networkInterface.isNetworkAvailable(false)
         }
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     fun unregisterNetworkCallback() {
         val connectivityManager =
             context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         connectivityManager.unregisterNetworkCallback(mNetworkCallback)
+    }
+
+    @Suppress("DEPRECATION")
+    private fun isNetworkAvailable(context: Context): Boolean {
+        return (context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager)
+            .activeNetworkInfo?.isConnected == true
     }
 }
